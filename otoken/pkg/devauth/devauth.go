@@ -24,9 +24,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/tiewei/gopack/otoken/pkg/openid"
 	"golang.org/x/oauth2"
-
-	"github.com/tiewei/gopack/otoken/pkg/types"
 )
 
 // expirationTime is internal type to avoid time value overflow
@@ -108,7 +107,7 @@ func New(tokenEndpoint string, authEndpoint string, clientID string, scopes []st
 		tokenEndpoint: tokenEndpoint,
 		authEndpoint:  authEndpoint,
 		clientID:      clientID,
-		scopes:        types.EnsureOpenIDScope(scopes),
+		scopes:        openid.EnsureOpenIDScope(scopes),
 	}
 }
 
