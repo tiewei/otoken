@@ -1,4 +1,4 @@
-package discover
+package openid
 
 import (
 	"context"
@@ -13,12 +13,8 @@ type Endpoint struct {
 	DeviceAuthURL string `json:"device_authorization_endpoint"`
 }
 
-type OIDC struct {
-	IssuerURI string
-}
-
-func (o *OIDC) Discover(ctx context.Context) (*Endpoint, error) {
-	provider, err := gooidc.NewProvider(ctx, o.IssuerURI)
+func Discover(ctx context.Context, IssuerURI string) (*Endpoint, error) {
+	provider, err := gooidc.NewProvider(ctx, IssuerURI)
 	if err != nil {
 		return nil, err
 	}
