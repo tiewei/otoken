@@ -9,37 +9,36 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type TokenSource struct {
+type TokenRefresher struct {
 	cfg           *oauth2.Config
-	refreshToken  string
 	refreshClient *http.Client
 }
 
-// Option configures optional field for TokenSource,
+// Option configures optional field for TokenRefresher,
 // it's an interface with private function, hence can
 // only be created within the pkg.
 type Option interface {
-	apply(*TokenSource)
+	apply(*TokenRefresher)
 }
 
 type option struct {
-	applyFunc func(*TokenSource)
+	applyFunc func(*TokenRefresher)
 }
 
-func (o option) apply(s *TokenSource) {
-	o.applyFunc(s)
+func (o option) apply(t *TokenRefresher) {
+	o.applyFunc(t)
 }
 
 // UseHTTPClient sets http client used to make http requests.
 func UseHTTPClient(c *http.Client) Option {
-	return &option{applyFunc: func(s *TokenSource) {
-		s.refreshClient = c
+	return &option{applyFunc: func(t *TokenRefresher) {
+		t.refreshClient = c
 	}}
 }
 
 // New creates a new refresher TokenSource
-func New(tokenURL string, clientID string, clientSecret string, refreshToken string, opts ...Option) *TokenSource {
-	ts := &TokenSource{
+func New(tokenURL string, clientID string, clientSecret string, opts ...Option) *TokenRefresher {
+	ts := &TokenRefresher{
 		cfg: &oauth2.Config{
 			Endpoint: oauth2.Endpoint{
 				TokenURL: tokenURL,
@@ -47,7 +46,6 @@ func New(tokenURL string, clientID string, clientSecret string, refreshToken str
 			ClientID:     clientID,
 			ClientSecret: clientSecret,
 		},
-		refreshToken: refreshToken,
 	}
 	for _, op := range opts {
 		if op != nil {
@@ -58,20 +56,36 @@ func New(tokenURL string, clientID string, clientSecret string, refreshToken str
 	return ts
 }
 
-// refresher.TokenSource creates a new token by using the refresh token grant flow.
-func (t *TokenSource) Token() (*oauth2.Token, error) {
-	if t.refreshToken == "" {
+func (r *TokenRefresher) Refresh(refreshToken string) (*oauth2.Token, error) {
+	if refreshToken == "" {
 		return nil, errors.New("no refresh token provided")
 	}
 	currentToken := &oauth2.Token{
 		Expiry:       time.Now().Add(-1 * time.Second),
-		RefreshToken: t.refreshToken,
+		RefreshToken: refreshToken,
 	}
 	ctx := context.Background()
-	if t.refreshClient != nil {
-		ctx = context.WithValue(ctx, oauth2.HTTPClient, t.refreshClient)
+	if r.refreshClient != nil {
+		ctx = context.WithValue(ctx, oauth2.HTTPClient, r.refreshClient)
 	}
-	token, err := t.cfg.TokenSource(ctx, currentToken).Token()
+	return r.cfg.TokenSource(ctx, currentToken).Token()
+}
+
+type TokenSource struct {
+	refresher    *TokenRefresher
+	refreshToken string
+}
+
+func NewTokenSource(tokenURL string, clientID string, clientSecret string, refreshToken string, opts ...Option) *TokenSource {
+	return &TokenSource{
+		refresher:    New(tokenURL, clientID, clientSecret, opts...),
+		refreshToken: refreshToken,
+	}
+}
+
+// refresher.TokenSource creates a new token by using the refresh token grant flow.
+func (t *TokenSource) Token() (*oauth2.Token, error) {
+	token, err := t.refresher.Refresh(t.refreshToken)
 	if token != nil && token.RefreshToken != "" {
 		t.refreshToken = token.RefreshToken
 	}

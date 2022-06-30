@@ -1,4 +1,4 @@
-package filestore
+package tokenstore
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/tiewei/gopack/otoken/pkg/refresher"
 	"golang.org/x/oauth2"
 )
 
@@ -70,22 +71,38 @@ func (f *FileStore) Save(token *oauth2.Token) error {
 // It's similar to oauth2.ReuseTokenSource, but allows wrapping with a customized
 // store.
 type CachedTokenSource struct {
-	Src   oauth2.TokenSource
-	Store Store
-	mu    sync.Mutex
+	Src       oauth2.TokenSource
+	Store     Store
+	Refresher *refresher.TokenRefresher
+	mu        sync.Mutex
 }
 
 func (c *CachedTokenSource) Token() (*oauth2.Token, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	token, err := c.Store.Token()
-	if err == nil && token.Valid() {
-		return token, nil
+	var token *oauth2.Token
+	var err error
+	defer func() {
+		if err != nil && token.Valid() {
+			//nolint:errcheck
+			c.Store.Save(token)
+		}
+	}()
+	token, err = c.Store.Token()
+	if err == nil {
+		if token.Valid() {
+			return token, nil
+		}
+		if token.RefreshToken != "" && c.Refresher != nil {
+			token, err = c.Refresher.Refresh(token.RefreshToken)
+			if err == nil {
+				return token, nil
+			}
+		}
 	}
-	token, err = c.Src.Token()
-	if err != nil && token.Valid() {
-		//nolint:errcheck
-		c.Store.Save(token)
+	if c.Src != nil {
+		token, err = c.Src.Token()
+		return token, err
 	}
-	return token, err
+	return nil, errors.New("No valid token and token source found")
 }

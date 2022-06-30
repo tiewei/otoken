@@ -72,7 +72,7 @@ func Timeout(t time.Duration) Option {
 // `types.StdoutPrompter` as prompter and `types.BrowserOpener`
 // as URLOpener. To change these, set Options when creating the
 // instance.
-func NewTokenSource(tokenEndpoint string, authEndpoint string, clientID string, scopes []string, opts ...Option) *TokenSource {
+func NewTokenSource(authEndpoint string, tokenEndpoint string, clientID string, scopes []string, opts ...Option) *TokenSource {
 	s := &TokenSource{
 		auth:     New(tokenEndpoint, authEndpoint, clientID, scopes),
 		client:   http.DefaultClient,
