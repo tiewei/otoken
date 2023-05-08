@@ -37,14 +37,13 @@ func UseHTTPClient(c *http.Client) Option {
 }
 
 // New creates a new refresher TokenSource
-func New(tokenURL string, clientID string, clientSecret string, opts ...Option) *TokenRefresher {
+func New(tokenURL string, clientID string, opts ...Option) *TokenRefresher {
 	ts := &TokenRefresher{
 		cfg: &oauth2.Config{
 			Endpoint: oauth2.Endpoint{
 				TokenURL: tokenURL,
 			},
-			ClientID:     clientID,
-			ClientSecret: clientSecret,
+			ClientID: clientID,
 		},
 	}
 	for _, op := range opts {
@@ -76,9 +75,9 @@ type TokenSource struct {
 	refreshToken string
 }
 
-func NewTokenSource(tokenURL string, clientID string, clientSecret string, refreshToken string, opts ...Option) *TokenSource {
+func NewTokenSource(tokenURL string, clientID string, refreshToken string, opts ...Option) *TokenSource {
 	return &TokenSource{
-		refresher:    New(tokenURL, clientID, clientSecret, opts...),
+		refresher:    New(tokenURL, clientID, opts...),
 		refreshToken: refreshToken,
 	}
 }
