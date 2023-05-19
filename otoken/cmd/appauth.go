@@ -18,9 +18,10 @@ func addAppAuth(cmd *cobra.Command) {
 	var clientID string
 	var issuerURI string
 	var clientSecret string
+	var redirectHostname string
+	var bindAddress string
 
 	var usePKCE bool
-	var useImplicit bool
 
 	scopes := []string{}
 
@@ -31,7 +32,7 @@ func addAppAuth(cmd *cobra.Command) {
 			if clientSecret == "" {
 				clientSecret = os.Getenv("OTOKEN_SECRET")
 			}
-			if clientSecret == "" && useImplicit {
+			if clientSecret == "" && !usePKCE {
 				return errors.New("client-secret is required when using implicit flow")
 			}
 			return nil
@@ -43,12 +44,20 @@ func addAppAuth(cmd *cobra.Command) {
 			}
 			var src oauth2.TokenSource
 
-			if useImplicit {
-				src = appauth.NewImplicit(endpoint.AuthURL, endpoint.TokenURL, clientID, clientSecret, scopes)
-			} else if usePKCE {
-				src = appauth.NewPKCE(endpoint.AuthURL, endpoint.TokenURL, clientID, scopes)
+			var opts []appauth.Option
+
+			if bindAddress != "" {
+				opts = append(opts, appauth.UseBindAddress([]string{bindAddress}))
+			}
+
+			if redirectHostname != "" {
+				opts = append(opts, appauth.UseRedirectHostname(redirectHostname))
+			}
+
+			if usePKCE {
+				src = appauth.NewPKCE(endpoint.AuthURL, endpoint.TokenURL, clientID, scopes, opts...)
 			} else {
-				return errors.New("Unknown grant flow, must choose implicit or PKCE")
+				src = appauth.NewImplicit(endpoint.AuthURL, endpoint.TokenURL, clientID, clientSecret, scopes, opts...)
 			}
 
 			if !noCache {
@@ -78,9 +87,10 @@ func addAppAuth(cmd *cobra.Command) {
 	appAuth.Flags().StringVarP(&clientSecret, "client-secret", "p", "", "OAuth2 client secret (required when use implicit flow), if empty, will use env $OTOKEN_SECRET")
 
 	appAuth.Flags().BoolVar(&usePKCE, "pkce", false, "use native app PKCE grant flow")
-	appAuth.Flags().BoolVar(&useImplicit, "implicit", false, "use native app implicit grant flow")
-	appAuth.MarkFlagsMutuallyExclusive("pkce", "implicit")
 	appAuth.Flags().StringArrayVar(&scopes, "scopes", []string{gooidc.ScopeOpenID, gooidc.ScopeOfflineAccess}, "scope used to request new token")
+
+	appAuth.Flags().StringVarP(&redirectHostname, "redirect-hostname", "r", "127.0.0.1", "The RFC8252 requires 127.0.0.1 address to for safety reason, user can set this if the provider does not accept 127.0.0.1 as redirect url")
+	appAuth.Flags().StringVarP(&bindAddress, "bind", "b", "", "Provides a way to bind local server on pre-configured addresses. The RFC8252 requires port to be any port when using loopback interface redirection, hence the default behavior is using first free port and 127.0.0.1 address")
 
 	cmd.AddCommand(appAuth)
 }
