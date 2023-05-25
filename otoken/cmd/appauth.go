@@ -26,7 +26,7 @@ func addAppAuth(cmd *cobra.Command) {
 	scopes := []string{}
 
 	appAuth := &cobra.Command{
-		Use:   "appAuth",
+		Use:   "app-auth",
 		Short: "Get oauth2 access token by using the native app authorization (RFC8252)",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if clientSecret == "" {

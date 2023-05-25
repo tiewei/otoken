@@ -19,7 +19,7 @@ func addDevAuth(cmd *cobra.Command) {
 	scopes := []string{}
 
 	devAuth := &cobra.Command{
-		Use:   "devAuth",
+		Use:   "dev-auth",
 		Short: "Get oauth2 access token by using the device authorization (RFC8628)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			endpoint, err := openid.Discover(cmd.Context(), issuerURI)
