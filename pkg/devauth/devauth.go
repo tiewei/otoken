@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tiewei/gopack/otoken/pkg/openid"
+	"github.com/tiewei/otoken/pkg/openid"
 	"golang.org/x/oauth2"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/tiewei/gopack/otoken/cmd"
+	"github.com/tiewei/otoken/cmd"
 )
 
 func main() {

@@ -8,8 +8,8 @@ import (
 
 	gooidc "github.com/coreos/go-oidc/v3/oidc"
 	"github.com/spf13/cobra"
-	"github.com/tiewei/gopack/otoken/pkg/appauth"
-	"github.com/tiewei/gopack/otoken/pkg/openid"
+	"github.com/tiewei/otoken/pkg/appauth"
+	"github.com/tiewei/otoken/pkg/openid"
 )
 
 func addAppAuth(cmd *cobra.Command) {

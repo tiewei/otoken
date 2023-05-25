@@ -5,8 +5,8 @@ import (
 
 	gooidc "github.com/coreos/go-oidc/v3/oidc"
 	"github.com/spf13/cobra"
-	"github.com/tiewei/gopack/otoken/pkg/devauth"
-	"github.com/tiewei/gopack/otoken/pkg/openid"
+	"github.com/tiewei/otoken/pkg/devauth"
+	"github.com/tiewei/otoken/pkg/openid"
 )
 
 func addDevAuth(cmd *cobra.Command) {

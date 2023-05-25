@@ -22,8 +22,8 @@ import (
 
 	"github.com/int128/oauth2cli"
 	"github.com/int128/oauth2cli/oauth2params"
-	"github.com/tiewei/gopack/otoken/pkg/openid"
-	"github.com/tiewei/gopack/otoken/pkg/types"
+	"github.com/tiewei/otoken/pkg/openid"
+	"github.com/tiewei/otoken/pkg/types"
 )
 
 // Option configures optional field for TokenSource,

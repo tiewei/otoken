@@ -1,4 +1,4 @@
-module github.com/tiewei/gopack/otoken
+module github.com/tiewei/otoken
 
 go 1.18
 

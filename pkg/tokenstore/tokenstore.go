@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/tiewei/gopack/otoken/pkg/refresher"
+	"github.com/tiewei/otoken/pkg/refresher"
 	"golang.org/x/oauth2"
 )
 

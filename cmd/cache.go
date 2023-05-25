@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/tiewei/gopack/otoken/pkg/refresher"
-	"github.com/tiewei/gopack/otoken/pkg/tokenstore"
+	"github.com/tiewei/otoken/pkg/refresher"
+	"github.com/tiewei/otoken/pkg/tokenstore"
 	"golang.org/x/oauth2"
 )
 

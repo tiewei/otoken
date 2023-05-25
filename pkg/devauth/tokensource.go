@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/tiewei/gopack/otoken/pkg/types"
+	"github.com/tiewei/otoken/pkg/types"
 	"golang.org/x/oauth2"
 )
 
