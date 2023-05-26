@@ -167,7 +167,6 @@ func (s *TokenSource) Token() (*oauth2.Token, error) {
 		OAuth2Config:         oauth2Cfg,
 		LocalServerReadyChan: readyChan,
 		RedirectURLHostname:  s.redirectHostname,
-		Logf:                 log.Printf,
 	}
 	if len(s.bindAddresses) > 0 {
 		config.LocalServerBindAddress = s.bindAddresses

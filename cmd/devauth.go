@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"encoding/json"
+
 	"golang.org/x/oauth2"
 
 	gooidc "github.com/coreos/go-oidc/v3/oidc"
@@ -37,7 +39,9 @@ func addDevAuth(cmd *cobra.Command) {
 			if err != nil {
 				return err
 			}
-			cmd.Print(token)
+
+			data, _ := json.MarshalIndent(token, "", "    ")
+			cmd.Print(string(data))
 			return nil
 		},
 	}

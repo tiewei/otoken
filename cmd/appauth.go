@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"errors"
 	"os"
 
@@ -68,7 +69,8 @@ func addAppAuth(cmd *cobra.Command) {
 			if err != nil {
 				return err
 			}
-			cmd.Print(token)
+			data, _ := json.MarshalIndent(token, "", "    ")
+			cmd.Print(string(data))
 			return nil
 		},
 	}

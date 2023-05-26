@@ -8,8 +8,8 @@ import (
 
 // Endpoint contains auth endpoints.
 type Endpoint struct {
-	TokenURL      string `json:"authorization_endpoint"`
-	AuthURL       string `json:"token_endpoint"`
+	TokenURL      string `json:"token_endpoint"`
+	AuthURL       string `json:"authorization_endpoint"`
 	DeviceAuthURL string `json:"device_authorization_endpoint"`
 }
 
