@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tiewei/otoken/pkg/devauth"
 	"github.com/tiewei/otoken/pkg/openid"
+	"github.com/tiewei/otoken/pkg/types"
 )
 
 func addDevAuth(cmd *cobra.Command) {
@@ -16,7 +17,7 @@ func addDevAuth(cmd *cobra.Command) {
 	var noCache bool
 	var clientID string
 	var issuerURI string
-	var clientSecret string
+	var noBrowser bool
 
 	scopes := []string{}
 
@@ -30,7 +31,14 @@ func addDevAuth(cmd *cobra.Command) {
 			}
 			var src oauth2.TokenSource
 
-			src = devauth.NewTokenSource(endpoint.DeviceAuthURL, endpoint.TokenURL, clientID, scopes)
+			var opts []devauth.Option
+
+			if noBrowser {
+				opts = append(opts, devauth.UseURLOpener(types.PromptOpener(types.StdoutPrompter)))
+			}
+
+			src = devauth.NewTokenSource(endpoint.DeviceAuthURL, endpoint.TokenURL, clientID, scopes, opts...)
+
 			if !noCache {
 				src = cachedSource(src, endpoint.TokenURL, clientID, cachePath)
 			}
@@ -57,9 +65,9 @@ func addDevAuth(cmd *cobra.Command) {
 	devAuth.MarkFlagRequired("client-id")
 	// nolint:errcheck
 	devAuth.MarkFlagRequired("issuer")
-	devAuth.Flags().StringVarP(&clientSecret, "client-secret", "p", "", "OAuth2 client secret (required when use implicit flow), if empty, will use env $OTOKEN_SECRET")
 
 	devAuth.Flags().StringArrayVar(&scopes, "scopes", []string{gooidc.ScopeOpenID, gooidc.ScopeOfflineAccess}, "scope used to request new token")
+	devAuth.Flags().BoolVar(&noBrowser, "no-browser", false, "flag to prevent opening URL in browser")
 
 	cmd.AddCommand(devAuth)
 }

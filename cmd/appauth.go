@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tiewei/otoken/pkg/appauth"
 	"github.com/tiewei/otoken/pkg/openid"
+	"github.com/tiewei/otoken/pkg/types"
 )
 
 func addAppAuth(cmd *cobra.Command) {
@@ -21,7 +22,7 @@ func addAppAuth(cmd *cobra.Command) {
 	var clientSecret string
 	var redirectHostname string
 	var bindAddress string
-
+	var noBrowser bool
 	var usePKCE bool
 
 	scopes := []string{}
@@ -55,6 +56,10 @@ func addAppAuth(cmd *cobra.Command) {
 				opts = append(opts, appauth.UseRedirectHostname(redirectHostname))
 			}
 
+			if noBrowser {
+				opts = append(opts, appauth.UseURLOpener(types.PromptOpener(types.StdoutPrompter)))
+			}
+
 			if usePKCE {
 				src = appauth.NewPKCE(endpoint.AuthURL, endpoint.TokenURL, clientID, scopes, opts...)
 			} else {
@@ -78,6 +83,7 @@ func addAppAuth(cmd *cobra.Command) {
 	// nolint:errcheck
 	appAuth.MarkFlagDirname("store")
 	appAuth.Flags().BoolVar(&noCache, "no-cache", false, "flag to avoid the token cache")
+	appAuth.Flags().BoolVar(&noBrowser, "no-browser", false, "flag to prevent opening URL in browser")
 	appAuth.MarkFlagsMutuallyExclusive("store", "no-cache")
 
 	appAuth.Flags().StringVarP(&clientID, "client-id", "c", "", "OAuth2 client ID")

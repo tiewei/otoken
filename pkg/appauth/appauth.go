@@ -41,13 +41,6 @@ func (o option) apply(s *TokenSource) {
 	o.applyFunc(s)
 }
 
-// UsePrompter sets prompter for tokensource
-func UsePrompter(p types.Prompter) Option {
-	return &option{applyFunc: func(s *TokenSource) {
-		s.prompter = p
-	}}
-}
-
 // UseURLOpener sets URL opener for tokensource
 func UseURLOpener(o types.URLOpener) Option {
 	return &option{applyFunc: func(s *TokenSource) {
@@ -101,7 +94,6 @@ type TokenSource struct {
 	usePKCE       bool
 
 	client           *http.Client
-	prompter         types.Prompter
 	opener           types.URLOpener
 	bindAddresses    []string
 	timeout          time.Duration
@@ -119,7 +111,6 @@ func NewPKCE(authEndpoint string, tokenEndpoint string, clientID string, scopes 
 		scopes:        openid.EnsureOpenIDScope(scopes),
 
 		client:           http.DefaultClient,
-		prompter:         types.StdoutPrompter,
 		opener:           types.BrowserOpener,
 		redirectHostname: "127.0.0.1",
 	}
@@ -140,7 +131,6 @@ func NewImplicit(authEndpoint string, tokenEndpoint string, clientID string, cli
 		scopes:        openid.EnsureOpenIDScope(scopes),
 
 		client:           http.DefaultClient,
-		prompter:         types.StdoutPrompter,
 		opener:           types.BrowserOpener,
 		redirectHostname: "127.0.0.1",
 	}
